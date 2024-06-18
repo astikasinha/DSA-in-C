@@ -1,201 +1,223 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include"astikastack1.h"
-struct node{
+#include <stdio.h>
+#include <stdlib.h>
+
+#define stacksize 100
+
+struct stack {
+    int item[stacksize];
+    int top;
+};
+
+void initialize(struct stack *s) {
+    s->top = -1;
+}
+
+int isempty(struct stack *s) {
+    return (s->top == -1);
+}
+
+int stacktop(struct stack *s) {
+    if (isempty(s)) {
+        printf("stack is empty\n");
+        exit(EXIT_FAILURE);
+    }
+    return s->item[s->top];
+}
+
+void push(struct stack *s, int x) {
+    if (s->top == (stacksize - 1)) {
+        printf("\nSTACK OVERFLOW\n");
+        exit(EXIT_FAILURE);
+    } else {
+        s->top++;
+        s->item[s->top] = x;
+    }
+}
+
+int pop(struct stack *s) {
+    if (isempty(s)) {
+        printf("\nSTACK UNDERFLOW\n");
+        exit(EXIT_FAILURE);
+    } else {
+        int x = s->item[s->top];
+        s->top--;
+        return x;
+    }
+}
+
+struct node {
     int info;
     struct node *next;
 };
-struct node *getnode(){
-    struct node *p;
-    p=(struct node *)malloc(sizeof(struct node));
-    return p;
+
+struct node *getnode() {
+    return (struct node *)malloc(sizeof(struct node));
 }
-void insertbegin(struct node **list,int x){
-    struct node *p;
-    p=getnode();
-    p->info=x;
-    p->next=*list;
-    *list=p;
+
+void insertbegin(struct node **list, int x) {
+    struct node *p = getnode();
+    p->info = x;
+    p->next = *list;
+    *list = p;
 }
-void insertafter(struct node **list,int y,int x){
-    struct node *temp;
-    struct node *p;
-    temp=*list;
-    while(temp!='\0'){
-        if(temp->info==y){
-            break;
-        }
-        else{
-            temp=temp->next;
-        }
+
+void insertafter(struct node **list, int y, int x) {
+    struct node *temp = *list;
+    while (temp != NULL && temp->info != y) {
+        temp = temp->next;
     }
-    p=getnode();
-    p->info=x;
-    p->next=temp->next;
-    temp->next=p;
-}
-void insertend(struct node **list,int x){
-    struct node *p;
-    struct node *q;
-    p=*list;
-    while(p->next!='\0'){
-        p=p->next;
+
+    if (temp == NULL) {
+        printf("%d not found in the list\n", y);
+        return;
     }
-    q=getnode();
-    q->info=x;
-    q->next='\0';
-    p->next=q;
+
+    struct node *p = getnode();
+    p->info = x;
+    p->next = temp->next;
+    temp->next = p;
 }
-int deletebegin(struct node **list){
-    struct node *temp;
-    int x;
-    temp=*list;
-    (*list)=(*list)->next;
-    x=temp->info;
+
+void insertend(struct node **list, int x) {
+    struct node *p = getnode();
+    p->info = x;
+    p->next = NULL;
+
+    if (*list == NULL) {
+        *list = p;
+    } else {
+        struct node *temp = *list;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = p;
+    }
+}
+
+int deletebegin(struct node **list) {
+    if (*list == NULL) {
+        printf("List is empty\n");
+        exit(EXIT_FAILURE);
+    }
+
+    struct node *temp = *list;
+    *list = (*list)->next;
+    int x = temp->info;
     free(temp);
     return x;
 }
-int deleteend(struct node **list){
-    struct node *p,*q;
-    p=*list;
-    q='\0';
-    int x;
-    while(p->next!='\0'){
-        q=p;
-        p=p->next;
+
+int deleteend(struct node **list) {
+    if (*list == NULL) {
+        printf("List is empty\n");
+        exit(EXIT_FAILURE);
     }
-    q->next='\0';
-    x=p->info;
+
+    struct node *p = *list;
+    struct node *q = NULL;
+    int x;
+
+    while (p->next != NULL) {
+        q = p;
+        p = p->next;
+    }
+
+    if (q == NULL) {
+        *list = NULL;
+    } else {
+        q->next = NULL;
+    }
+
+    x = p->info;
     free(p);
     return x;
-
 }
-int count(struct node *list){
-    int c=0;
-    struct node *p;
-    p=list;
-    while(p!='\0'){
+
+int count(struct node *list) {
+    int c = 0;
+    struct node *p = list;
+    while (p != NULL) {
         c++;
-        p=p->next;
+        p = p->next;
     }
     return c;
 }
-int countevenodd(struct node *list){
-    int ce=0,co=0;
-    struct node *p;
-    p=list;
-    while(p!='\0'){
-        if((p->info)%2==0){
+
+void countevenodd(struct node *list) {
+    int ce = 0, co = 0;
+    struct node *p = list;
+    while (p != NULL) {
+        if ((p->info) % 2 == 0) {
             ce++;
-        }
-        else{
+        } else {
             co++;
         }
-        p=p->next;
+        p = p->next;
     }
-    printf("even %d         odd %d\n",ce,co);
+    printf("even %d         odd %d\n", ce, co);
 }
-void pairwiseswap(struct node **list){
-    struct node *p;
-    struct node *q,*m;
-    p=*list;
-    q=(*list)->next;
-    while(p!='\0'&& q!='\0'){
-        int t=p->info;
-        p->info=q->info;
-        q->info=t;
-        p=p->next->next;
-        q=q->next;
-        if(q!='\0'){
-            q=q->next;
-        }
 
-    }
-    m=*list;
-    while(m!='\0'){
-        printf("%d ",m->info);
-        m=m->next;
+void pairwiseswap(struct node **list) {
+    struct node *p = *list;
+    while (p != NULL && p->next != NULL) {
+        int t = p->info;
+        p->info = p->next->info;
+        p->next->info = t;
+        p = p->next->next;
     }
 }
-int middleelement(struct node *list){
-    struct node *t,*r;
-    t=list;
-    r=list->next;
-    while(r!='\0'&& r->next!='\0'){
-        t=t->next;
-        r=r->next->next;
-    }
-    return t->info;
-}
-void reverselinkedlist(struct node**list){
-    struct node *p,*m;
-    p=*list;
+
+
+
+void reverselinkedlist(struct node **list) {
+    struct node *p = *list;
     struct stack s1;
     initialize(&s1);
-    while(p!='\0'){
-        push(&s1,p->info);
-        p=p->next;
+
+    while (p != NULL) {
+        push(&s1, p->info);
+        p = p->next;
     }
-    p=*list;
-    while(!isempty(&s1)){
-        int x=pop(&s1);
-        p->info=x;
-        p=p->next;
+
+    p = *list;
+    while (!isempty(&s1)) {
+        int x = pop(&s1);
+        p->info = x;
+        p = p->next;
     }
-    m=*list;
-    while(m!='\0'){
-        printf("%d ",m->info);
-        m=m->next;
+
+    struct node *m = *list;
+    while (m != NULL) {
+        printf("%d ", m->info);
+        m = m->next;
     }
-    
 }
+
 void concatenate(struct node **start1, struct node **start2) {
-    struct node *p, *m;
+    struct node *p = *start1;
 
-    if ((*start1) == NULL && (*start2) == NULL) {
+    if (p == NULL && *start2 == NULL) {
         printf("Both lists are empty.\n");
-    } else {
-        if ((*start1) == NULL) {
-            *start1 = *start2;
-        } else {
-            p = *start1;
-            while (p->next != NULL) {
-                p = p->next;
-            }
-            p->next = *start2;
-        }
+        return;
+    }
 
-        m = (*start1);
-        while (m != NULL) {
-            printf("%d ", m->info);
-            m = m->next;
+    if (p == NULL) {
+        *start1 = *start2;
+    } else {
+        while (p->next != NULL) {
+            p = p->next;
         }
+        p->next = *start2;
+    }
+
+    struct node *m = *start1;
+    while (m != NULL) {
+        printf("%d ", m->info);
+        m = m->next;
     }
 }
-void last(struct node **list,int x){
-    struct node *p,*m;
-    p=*list;
-    struct stack s1;
-    initialize(&s1);
-    while(p!='\0'){
-        push(&s1,p->info);
-        p=p->next;
-    }
-    p=*list;
-    while(!isempty(&s1)){
-        int x=pop(&s1);
-        p->info=x;
-        p=p->next;
-    }
-    m=*list;
-    int i=0;
-    while((m->info)!=x){
-        i++;
-        m=m->next;
-    }
-    printf("%d at position %d from last in linked list",m->info,i);
-    
-}
+
+
 void sort(struct node **list) {
     struct node *t, *r;
     t = *list;
@@ -228,7 +250,7 @@ void sort(struct node **list) {
 void traverse(struct node *list){
     struct node *p;
     p=list;
-    while(p!='\0'){
+    while(p!=NULL){
         printf("%d ",p->info);
         p=p->next;
     }
@@ -238,13 +260,14 @@ void main(){
     start ='\0';
     start1='\0';
     start2='\0';
-    insertbegin(&start,100);
-    insertbegin(&start,200);
-    insertbegin(&start,300);
-    insertbegin(&start,400);
+    insertend(&start,100);
+    insertend(&start,200);
+    insertend(&start,300);
+    insertend(&start,400);
     insertend(&start,500);
     insertend(&start,600);
     insertend(&start,800);
+    printf("\n");
     insertafter(&start,600,700);
     traverse(start);
     printf("\n");
@@ -262,12 +285,6 @@ void main(){
     countevenodd(start);
     printf("\n");
     pairwiseswap(&start);
-    printf("\n");
-    last(&start,200);
-    printf("\n");
-    int b=middleelement(start);
-    printf("%d",b);
-    printf("\n");
     printf("\n");
     sort(&start);
     printf("\n");

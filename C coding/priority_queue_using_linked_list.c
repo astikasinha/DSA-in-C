@@ -91,3 +91,41 @@ void traverse(struct node *list){
         p=p->next;
     }
 }
+void pqinsert(struct node **start,int prn){
+    struct node *p,*q;
+    p=(*start);
+    q=NULL;
+    while(p!=NULL && prn>=p->info){
+        q=p;
+        p=p->next;
+    }
+    if(q==NULL){
+        insertbegin(&(*start),prn);
+    }
+    else{
+        insertafter(&(*start),q->info,prn);
+    }
+}
+int pqdelete(struct node **start){
+    if((*start)!=NULL){
+        int x;
+        x=deletebegin(&(*start));
+        return x;
+    }
+    else{
+        return -1;
+    }
+}
+int main() {
+    struct node *start;
+    start=NULL;
+    pqinsert(&start,1);
+    pqinsert(&start,10);
+    pqinsert(&start,5);
+
+    int k=pqdelete(&start);
+    printf("%d \n",k);
+    traverse(start);
+
+    return 0;
+}
